@@ -113,9 +113,9 @@ class EpgService {
         final children = match.group(2) ?? '';
 
         // Extract attributes from <programme ...> tag
-        final startMatch = RegExp(r'start=["\']([^"\']*)["\']', caseSensitive: false).firstMatch(attributes);
-        final stopMatch = RegExp(r'stop=["\']([^"\']*)["\']', caseSensitive: false).firstMatch(attributes);
-        final channelMatch = RegExp(r'channel=["\']([^"\']*)["\']', caseSensitive: false).firstMatch(attributes);
+        final startMatch = RegExp(r'''start=["']([^"']*)["']''', caseSensitive: false).firstMatch(attributes);
+        final stopMatch = RegExp(r'''stop=["']([^"']*)["']''', caseSensitive: false).firstMatch(attributes);
+        final channelMatch = RegExp(r'''channel=["']([^"']*)["']''', caseSensitive: false).firstMatch(attributes);
 
         final startStr = startMatch?.group(1);
         final stopStr = stopMatch?.group(1);
@@ -134,8 +134,8 @@ class EpgService {
         }
 
         // Extract nested element tags (<title> and <desc> / <description>)
-        final titleMatch = RegExp(r'<title\s*[^>]*>(.*?)</title>', dotAll: true, caseSensitive: false).firstMatch(children);
-        final descMatch = RegExp(r'<(desc|description)\s*[^>]*>(.*?)</\1>', dotAll: true, caseSensitive: false).firstMatch(children);
+        final titleMatch = RegExp(r'''<title\s*[^>]*>(.*?)</title>''', dotAll: true, caseSensitive: false).firstMatch(children);
+        final descMatch = RegExp(r'''<(desc|description)\s*[^>]*>(.*?)</(?:desc|description)>''', dotAll: true, caseSensitive: false).firstMatch(children);
 
         final title = _stripCdataAndHtml(titleMatch?.group(1) ?? 'No Title');
         final description = _stripCdataAndHtml(descMatch?.group(2) ?? '');
