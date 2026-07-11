@@ -133,7 +133,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         if (mounted) {
           if (!_hasRetried) {
             _hasRetried = true;
-            debugPrint('Video Player stream error: $error. Retrying stream once...');
+            debugPrint(
+                'Video Player stream error: $error. Retrying stream once...');
             _initializePlayer();
           } else {
             setState(() {
@@ -184,7 +185,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         }
         if (!_hasRetried) {
           _hasRetried = true;
-          debugPrint('Initial stream open failed: $e. Retrying stream once...');
+          debugPrint(
+              'Initial stream open failed: $e. Retrying stream once...');
           _initializePlayer();
           return;
         } else {
@@ -207,7 +209,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     } catch (e) {
       if (mounted && _loadingUrl == currentUrl) {
         setState(() {
-          _errorMessage = 'Failed to initialize player engine: ${e.toString()}';
+          _errorMessage =
+              'Failed to initialize player engine: ${e.toString()}';
           _isLoading = false;
         });
       }
