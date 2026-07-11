@@ -1,0 +1,79 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - 'release/*'
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  analyze-and-test:
+    name: Lint, Format, and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure Debug Keystore
+        run: |
+          if [ -f "debug.keystore.base64" ]; then
+            echo "Decoding existing debug.keystore.base64..."
+            base64 --decode debug.keystore.base64 > debug.keystore
+          else
+            echo "debug.keystore.base64 not found, generating a new debug.keystore..."
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Version Validation
+        run: python scripts/validate_version.py
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Check Dart Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Flutter Analyzer
+        run: flutter analyze
+
+      - name: Run Flutter Unit Tests
+        run: |
+          if [ -d "test" ]; then
+            flutter test
+          else
+            echo "No Flutter test directory found. Skipping."
+          fi
+
+      - name: Run Native Android Unit Tests
+        run: |
+          if [ -d "app/src/test" ]; then
+            gradle :app:testDebugUnitTest --no-daemon
+          else
+            echo "No native Android tests found. Skipping."
+          fi

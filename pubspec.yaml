@@ -1,0 +1,71 @@
+name: nexora
+description: A modern IPTV Player built with Flutter following Clean Architecture guidelines.
+version: 1.4.0-RC1+14
+
+publish_to: 'none' # Prevent accidental publishing to pub.dev
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Video Playback Engine (MediaKit)
+  media_kit: ^1.1.10
+  media_kit_video: ^1.2.4
+  media_kit_libs_video: ^1.0.4
+
+  # Keep Screen Awake
+  wakelock_plus: ^1.2.8
+
+  # State Management (Riverpod)
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.3
+
+  # Navigation (Go Router)
+  go_router: ^14.0.1
+
+  # Local Storage (Shared Preferences)
+  shared_preferences: ^2.2.3
+
+  # Networking (HTTP)
+  http: ^1.2.1
+
+  # JSON Serialization & Code Generation helpers
+  json_annotation: ^4.9.0
+
+  # Icons
+  flutter_vector_icons: ^1.0.0
+  material_design_icons_flutter: ^7.0.7296
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting & Code Analysis
+  flutter_lints: ^4.0.0
+
+  # Code generation (for Riverpod annotations & JSON serialization)
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.3.9
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true
+
+  # Define asset directories as requested in the structure
+  assets:
+    - assets/animations/
+    - assets/fonts/
+    - assets/icons/
+    - assets/images/
+    - assets/logos/
+
+  # Example of font configurations (can be populated when custom fonts are added)
+  # fonts:
+  #   - family: SpaceGrotesk
+  #     fonts:
+  #       - asset: assets/fonts/SpaceGrotesk-Regular.ttf
+  #       - asset: assets/fonts/SpaceGrotesk-Bold.ttf
+  #         weight: 700

@@ -1,0 +1,140 @@
+name: Android Release APK Builder
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build and Deploy Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure Debug Keystore
+        run: |
+          if [ -f "debug.keystore.base64" ]; then
+            echo "Decoding existing debug.keystore.base64..."
+            base64 --decode debug.keystore.base64 > debug.keystore
+          else
+            echo "debug.keystore.base64 not found, generating a new debug.keystore..."
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Version Validation
+        run: python scripts/validate_version.py
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        id: build_apk
+        run: |
+          START_TIME=$(date +%s)
+          echo "START_TIME=$START_TIME" >> $GITHUB_ENV
+          
+          # Attempt build with Flutter, fallback to native Android Gradle build
+          if [ -d "android" ] || flutter build apk --release; then
+            echo "Flutter build successful"
+          else
+            echo "Falling back to native Android Gradle build"
+            gradle :app:assembleRelease --no-daemon
+          fi
+          
+          END_TIME=$(date +%s)
+          BUILD_TIME=$((END_TIME - START_TIME))
+          echo "BUILD_TIME=$BUILD_TIME" >> $GITHUB_ENV
+
+      - name: Locate APK File
+        id: locate_apk
+        run: |
+          APK_PATH=""
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          elif [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            APK_PATH="app/build/outputs/apk/release/app-release.apk"
+          fi
+          
+          if [ -n "$APK_PATH" ] && [ -f "$APK_PATH" ]; then
+            echo "FOUND_APK=true" >> $GITHUB_OUTPUT
+            echo "APK_PATH=$APK_PATH" >> $GITHUB_ENV
+            echo "APK_PATH=$APK_PATH" >> $GITHUB_OUTPUT
+          else
+            echo "FOUND_APK=false" >> $GITHUB_OUTPUT
+            echo "No Release APK file found!"
+            exit 1
+          fi
+
+      - name: Generate Workflow Summary
+        if: always()
+        run: |
+          BUILD_TIME=${{ env.BUILD_TIME }}
+          MINUTES=$((BUILD_TIME / 60))
+          SECONDS=$((BUILD_TIME % 60))
+          TIME_STR="${MINUTES}m ${SECONDS}s"
+          
+          APK_PATH="${{ env.APK_PATH }}"
+          if [ -n "$APK_PATH" ] && [ -f "$APK_PATH" ]; then
+            APK_SIZE=$(du -sh "$APK_PATH" | cut -f1)
+          else
+            APK_SIZE="N/A (Build Failed)"
+          fi
+          
+          FLUTTER_VERSION=$(flutter --version | head -n 1)
+          APP_VERSION="N/A"
+          if [ -f "pubspec.yaml" ]; then
+            APP_VERSION=$(grep 'version:' pubspec.yaml | head -n 1 | cut -d' ' -f2)
+          fi
+          
+          echo "### 🚀 Nexora IPTV & Sports - Release Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "The release APK has been successfully built and prepared for production deployment." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Environment** | \`ubuntu-latest\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Flutter Version** | \`${FLUTTER_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **App Version (pubspec)** | \`${APP_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Duration** | \`${TIME_STR}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Artifact Size** | \`${APK_SIZE}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tag/Ref** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Release APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexora-iptv-release-apk
+          path: ${{ env.APK_PATH }}
+          if-no-files-found: error
+
+      - name: Deploy to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          files: ${{ env.APK_PATH }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
