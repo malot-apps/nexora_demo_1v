@@ -133,8 +133,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         if (mounted) {
           if (!_hasRetried) {
             _hasRetried = true;
-            debugPrint(
-                'Video Player stream error: $error. Retrying stream once...');
+            debugPrint('Video Player stream error: $error. Retrying stream once...');
             _initializePlayer();
           } else {
             setState(() {
@@ -185,8 +184,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         }
         if (!_hasRetried) {
           _hasRetried = true;
-          debugPrint(
-              'Initial stream open failed: $e. Retrying stream once...');
+          debugPrint('Initial stream open failed: $e. Retrying stream once...');
           _initializePlayer();
           return;
         } else {
@@ -209,8 +207,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     } catch (e) {
       if (mounted && _loadingUrl == currentUrl) {
         setState(() {
-          _errorMessage =
-              'Failed to initialize player engine: ${e.toString()}';
+          _errorMessage = 'Failed to initialize player engine: ${e.toString()}';
           _isLoading = false;
         });
       }
@@ -263,7 +260,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
   }
 
-  /// Cancels any active fade timers, disposes the native video controllers,
+  /// Cancels any active fade timers, disposes the native video controllers, 
   /// and releases system wakelocks.
   @override
   void dispose() {
@@ -378,8 +375,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 child: IgnorePointer(
                   ignoring: !_showControls,
                   child: IconButton(
-                    icon: const Icon(Icons.fullscreen_rounded,
-                        color: Colors.white, size: 24.0),
+                    icon: const Icon(Icons.fullscreen_rounded, color: Colors.white, size: 24.0),
                     onPressed: () {
                       _startControlsTimer();
                       PlayerFullscreen.enter(
@@ -392,8 +388,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     tooltip: 'Fullscreen',
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black54,
-                      side: const BorderSide(
-                          color: AppColors.borderTranslucent, width: 1.0),
+                      side: const BorderSide(color: AppColors.borderTranslucent, width: 1.0),
                       padding: const EdgeInsets.all(8.0),
                     ),
                   ),

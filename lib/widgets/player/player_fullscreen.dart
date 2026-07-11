@@ -26,7 +26,7 @@ class PlayerFullscreen {
   }) async {
     // Hide standard System UI overlays for immersive viewing
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
+    
     // Enable both Landscape and Portrait orientations for flexible full-screen rotation
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -89,7 +89,7 @@ class _PlayerFullscreenPageState extends State<PlayerFullscreenPage> {
   void initState() {
     super.initState();
     _startControlsTimer();
-
+    
     // Auto-detect initial orientation aspect ratios
     _updateOrientationStatus();
 
@@ -313,8 +313,7 @@ class _PlayerFullscreenPageState extends State<PlayerFullscreenPage> {
                                 ),
                                 const SizedBox(width: 10.0),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 4.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                                   decoration: BoxDecoration(
                                     color: Colors.black87,
                                     borderRadius: BorderRadius.circular(4.0),
