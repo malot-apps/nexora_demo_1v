@@ -260,7 +260,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     }
   }
 
-  /// Cancels any active fade timers, disposes the native video controllers, 
+  /// Cancels any active fade timers, disposes the native video controllers,
   /// and releases system wakelocks.
   @override
   void dispose() {
@@ -375,7 +375,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 child: IgnorePointer(
                   ignoring: !_showControls,
                   child: IconButton(
-                    icon: const Icon(Icons.fullscreen_rounded, color: Colors.white, size: 24.0),
+                    icon: const Icon(Icons.fullscreen_rounded,
+                        color: Colors.white, size: 24.0),
                     onPressed: () {
                       _startControlsTimer();
                       PlayerFullscreen.enter(
@@ -388,7 +389,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     tooltip: 'Fullscreen',
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black54,
-                      side: const BorderSide(color: AppColors.borderTranslucent, width: 1.0),
+                      side: const BorderSide(
+                          color: AppColors.borderTranslucent, width: 1.0),
                       padding: const EdgeInsets.all(8.0),
                     ),
                   ),
