@@ -17,13 +17,13 @@ class EpgService {
 
   // In-memory cache for parsed EPG models
   static final Map<String, List<EpgModel>> _epgCache = {};
-  
+
   // Timestamps tracking when each EPG source was last loaded
   static final Map<String, DateTime> _lastLoadedTimes = {};
-  
+
   // Coalescing concurrent request futures to prevent duplicate network calls
   static final Map<String, Future<List<EpgModel>>> _pendingRequests = {};
-  
+
   // Cache Time-To-Live (TTL) duration
   static const Duration _cacheDuration = Duration(minutes: 5);
 
@@ -94,7 +94,7 @@ class EpgService {
   /// Extremely robust against missing attributes, invalid XML nodes, or wrong dates.
   List<EpgModel> loadFromString(String xmlContent) {
     if (xmlContent.isEmpty) return <EpgModel>[];
-    
+
     final hash = xmlContent.hashCode;
     if (_xmlParsedCache.containsKey(hash)) {
       return _xmlParsedCache[hash]!;
@@ -113,9 +113,12 @@ class EpgService {
         final children = match.group(2) ?? '';
 
         // Extract attributes from <programme ...> tag
-        final startMatch = RegExp(r'''start=["']([^"']*)["']''', caseSensitive: false).firstMatch(attributes);
-        final stopMatch = RegExp(r'''stop=["']([^"']*)["']''', caseSensitive: false).firstMatch(attributes);
-        final channelMatch = RegExp(r'''channel=["']([^"']*)["']''', caseSensitive: false).firstMatch(attributes);
+        final startMatch = RegExp(r'''start=["']([^"']*)["']''', caseSensitive: false)
+            .firstMatch(attributes);
+        final stopMatch = RegExp(r'''stop=["']([^"']*)["']''', caseSensitive: false)
+            .firstMatch(attributes);
+        final channelMatch = RegExp(r'''channel=["']([^"']*)["']''', caseSensitive: false)
+            .firstMatch(attributes);
 
         final startStr = startMatch?.group(1);
         final stopStr = stopMatch?.group(1);
@@ -134,8 +137,14 @@ class EpgService {
         }
 
         // Extract nested element tags (<title> and <desc> / <description>)
-        final titleMatch = RegExp(r'''<title\s*[^>]*>(.*?)</title>''', dotAll: true, caseSensitive: false).firstMatch(children);
-        final descMatch = RegExp(r'''<(desc|description)\s*[^>]*>(.*?)</(?:desc|description)>''', dotAll: true, caseSensitive: false).firstMatch(children);
+        final titleMatch = RegExp(r'''<title\s*[^>]*>(.*?)</title>''',
+                dotAll: true, caseSensitive: false)
+            .firstMatch(children);
+        final descMatch = RegExp(
+                r'''<(desc|description)\s*[^>]*>(.*?)</(?:desc|description)>''',
+                dotAll: true,
+                caseSensitive: false)
+            .firstMatch(children);
 
         final title = _stripCdataAndHtml(titleMatch?.group(1) ?? 'No Title');
         final description = _stripCdataAndHtml(descMatch?.group(2) ?? '');
@@ -201,7 +210,7 @@ class EpgService {
     if (text.startsWith('<![CDATA[') && text.endsWith(']]>')) {
       text = text.substring(9, text.length - 3).trim();
     }
-    
+
     // Decode HTML/XML entity encodings safely
     text = text
         .replaceAll('&amp;', '&')
