@@ -231,7 +231,8 @@ class PlayerControls extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                ];
+                                ],
+                              );
                               },
                             );
                         },
