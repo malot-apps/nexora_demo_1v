@@ -44,7 +44,9 @@ class PlayerError extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              error.isNotEmpty ? error : 'The stream format is unsupported, offline, or timed out. Please check your network connection.',
+              error.isNotEmpty
+                  ? error
+                  : 'The stream format is unsupported, offline, or timed out. Please check your network connection.',
               textAlign: TextAlign.center,
               style: AppTextStyles.bodySmall.copyWith(
                 color: Colors.white60,
