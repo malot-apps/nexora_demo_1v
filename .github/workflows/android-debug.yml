@@ -58,7 +58,7 @@ jobs:
           echo "START_TIME=$START_TIME" >> $GITHUB_ENV
           
           # Attempt build with Flutter, fallback to native Gradle build
-          if [ -d "android" ] || flutter build apk --debug; then
+          if flutter build apk --debug; then
             echo "Flutter build successful"
           else
             echo "Falling back to native Android Gradle build"
